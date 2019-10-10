@@ -19,7 +19,8 @@ phases:
         - export KUBECONFIG=$HOME/.kube/config
   build:
     commands:
-      - docker build -t 449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG .
+      - docker build -t eksws-ecrdo-1r9p48bv1smtx .
+      - docker image tag eksws-ecrdo-1r9p48bv1smtx 449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG
 
   post_build:
     commands:
