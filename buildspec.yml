@@ -10,9 +10,6 @@ phases:
       - chmod +x ./kubectl ./aws-iam-authenticator
       - export PATH=$PWD/:$PATH
       - apt-get update && apt-get -y install jq python3-pip python3-dev && pip3 install --upgrade awscli
-      - curl -fsSL https://get.docker.com -o get-docker.sh
-      - sh get-docker.sh
-      - service docker restart
   pre_build:
       commands:
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
@@ -21,6 +18,7 @@ phases:
         - export KUBECONFIG=$HOME/.kube/config
   build:
     commands:
+      - docker run hello-world
       - docker build -t eksws-ecrdo-1r9p48bv1smtx .
       - docker image tag eksws-ecrdo-1r9p48bv1smtx 449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG
 
