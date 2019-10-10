@@ -13,18 +13,16 @@ phases:
   pre_build:
       commands:
         - TAG="$REPOSITORY_NAME.$REPOSITORY_BRANCH.$ENVIRONMENT_NAME.$(date +%Y-%m-%d.%H.%M.%S).$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
-        - sed -i 's@CONTAINER_IMAGE@'"449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG"'@' hello-k8s.yml
+        - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' hello-k8s.yml
         - $(aws ecr get-login --no-include-email)
         - export KUBECONFIG=$HOME/.kube/config
   build:
     commands:
-      - docker run hello-world
-      - docker build -t eksws-ecrdo-1r9p48bv1smtx .
-      - docker image tag eksws-ecrdo-1r9p48bv1smtx 449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG
+      - docker build --tag $REPOSITORY_URI:$TAG .
 
   post_build:
     commands:
-      - docker push 449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG
+      - docker push $REPOSITORY_URI:$TAG
       - CREDENTIALS=$(aws sts assume-role --role-arn $EKS_KUBECTL_ROLE_ARN --role-session-name codebuild-kubectl --duration-seconds 900)
       - export AWS_ACCESS_KEY_ID="$(echo ${CREDENTIALS} | jq -r '.Credentials.AccessKeyId')"
       - export AWS_SECRET_ACCESS_KEY="$(echo ${CREDENTIALS} | jq -r '.Credentials.SecretAccessKey')"
@@ -34,6 +32,6 @@ phases:
       - kubectl version --short
       - kubectl get nodes
       - kubectl apply -f hello-k8s.yml
-      - printf '[{"name":"hello-k8s","imageUri":"%s"}]' 449814511849.dkr.ecr.us-west-2.amazonaws.com/eksws-ecrdo-1r9p48bv1smtx:$TAG > build.json
+      - printf '[{"name":"hello-k8s","imageUri":"%s"}]' $REPOSITORY_URI:$TAG > build.json
 artifacts:
   files: build.json
