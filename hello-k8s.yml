@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: hello-k8s
-          image: CONTAINER_IMAGE
+          image: environ:1.1.20191217-1355-SNAPSHOT
           securityContext:
             privileged: false
             readOnlyRootFilesystem: true
