@@ -31,7 +31,7 @@ spec:
     spec:
       containers:
         - name: hello-k8s
-          image: IMAGE
+          image: ashokshingade24/api-service-go:13
           securityContext:
             privileged: false
             readOnlyRootFilesystem: true
